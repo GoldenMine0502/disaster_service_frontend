@@ -60,8 +60,7 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
     _timer?.cancel(); // 기존 타이머가 있으면 취소
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
       if (mounted) {
-        setState(() {
-        });
+        fetchCurrentStatus();
       }
     });
   }
@@ -72,8 +71,15 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
     var dto = res.list.where((li) => checkIfWithinOneDay(li.timestamp)).firstOrNull;
 
     if(dto != null) {
+      debugPrint(dto.getImageUri());
       image = Image.network(dto.getImageUri());
     }
+
+    isDisaster = dto != null;
+
+    setState(() {
+
+    });
 
     return dto != null;
   }
@@ -283,6 +289,10 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
                                       color: const Color(0xFF17A1AE), // 내부 박스 색상
                                       borderRadius: BorderRadius.circular(20),
                                     ),
+                                    child: image != null ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(20),
+                                        child: image
+                                    ) : const CircularProgressIndicator(),
                                   ),
                                   // const Align(
                                   //   alignment: Alignment.bottomRight,
@@ -343,27 +353,11 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: fetchCurrentStatus(), // Future 함수 호출
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // Future가 아직 완료되지 않은 경우 로딩 인디케이터 표시
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          // Future 실행 중 에러 발생 시 에러 메시지 표시
-          return Text("Error: ${snapshot.error}");
-        } else if (snapshot.hasData) {
-          // Future가 완료되고 데이터가 있는 경우 true 또는 false에 따라 다른 UI 표시
-          if (snapshot.data == true) {
-            return disaster(context);
-          } else {
-            return normal(context);
-          }
-        } else {
-          // 데이터가 없을 때 (예외 상황)
-          return const Text("No data available.");
-        }
-      },
-    );
+    debugPrint("disaster: $isDisaster");
+    if (isDisaster) {
+      return disaster(context);
+    } else {
+      return normal(context);
+    }
   }
 }
