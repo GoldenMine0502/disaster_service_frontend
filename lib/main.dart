@@ -1,18 +1,16 @@
-
-import 'package:disaster_service_frontend/status_viewer.dart';
+import 'package:disaster_service_frontend/status_viewer_v2.dart';
 import 'package:flutter/material.dart';
 
+import 'consts.dart';
+import 'disaster_guide.dart';
+import 'disaster_shelter.dart';
+import 'emergency_contact.dart';
 import 'image_upload.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
+class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'Drawer with Body Change',
       home: HomePage(),
     );
   }
@@ -22,62 +20,100 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<StatefulWidget> createState() { return HomePageState(); }
-
+  State<StatefulWidget> createState() {
+    return HomePageState();
+  }
 }
 
 class HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;  // 현재 선택된 화면의 인덱스
+  int _selectedIndex = 0; // 현재 선택된 화면의 인덱스
 
   // 각 탭에 보여줄 화면 위젯 리스트
   final List<Widget> _pages = [
     const StatusViewerScreen(),
+    const DisasterGuideScreen(),
+    const DisasterShelterScreen(),
+    const EmergencyContactScreen(),
+    const EmergencyContactScreen(),
     const ImageUploadScreen(),
   ];
 
   void _onDrawerItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;  // 인덱스를 변경하여 body 교체
+      _selectedIndex = index; // 인덱스를 변경하여 body 교체
     });
-    Navigator.pop(context);  // 드로어 메뉴 닫기
+    Navigator.pop(context); // 드로어 메뉴 닫기
   }
 
   @override
   Widget build(BuildContext context) {
+    const menuTextStyle = TextStyle(
+        fontSize: 25,
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.bold
+    );
+
+    const menuTextStyleSmall = TextStyle(
+        fontSize: 15,
+        fontFamily: 'Pretendard',
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Test'),
+        title: logoSmall,
+        centerTitle: true,
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
+            DrawerHeader(
+              padding: const EdgeInsets.all(20),
+              // decoration: const BoxDecoration(
+              //   color: Colors.blue,
+              // ),
+              child: logoBig,
             ),
             ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Status Viewer'),
+              contentPadding: const EdgeInsets.only(left: 20, top: 5),
+              // leading: const Icon(Icons.one),
+              title: const Text('➊  재난 상태', style: menuTextStyle),
               onTap: () => _onDrawerItemTapped(0),
             ),
             ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Image Upload'),
+              contentPadding: const EdgeInsets.only(left: 20, top: 10),
+              // leading: const Icon(Icons.settings),
+              title: const Text('➋  재난시 대처법', style: menuTextStyle),
               onTap: () => _onDrawerItemTapped(1),
+            ),
+            ListTile(
+              contentPadding: const EdgeInsets.only(left: 20, top: 10),
+              // leading: const Icon(Icons.settings),
+              title: const Text('➌  재난 대피소', style: menuTextStyle),
+              onTap: () => _onDrawerItemTapped(2),
+            ),
+            ListTile(
+              contentPadding: const EdgeInsets.only(left: 20, top: 10),
+              // leading: const Icon(Icons.settings),
+              title: const Text('➍  비상 연락처', style: menuTextStyle),
+              onTap: () => _onDrawerItemTapped(3),
+            ),
+            ListTile(
+              contentPadding: const EdgeInsets.only(left: 20),
+              // leading: const Icon(Icons.settings),
+              title: const Text('설정', style: menuTextStyleSmall),
+              onTap: () => _onDrawerItemTapped(3),
+            ),
+            ListTile(
+              contentPadding: const EdgeInsets.only(left: 20),
+              // leading: const Icon(Icons.settings),
+              title: const Text('(이미지 업로드)', style: menuTextStyleSmall),
+              onTap: () => _onDrawerItemTapped(4),
             ),
           ],
         ),
       ),
-      body: _pages[_selectedIndex],  // 현재 선택된 인덱스에 따라 body 교체
+      body: _pages[_selectedIndex], // 현재 선택된 인덱스에 따라 body 교체
     );
   }
 }
