@@ -135,7 +135,6 @@ class StatusViewerScreenState extends State<StatusViewerScreen> {
                       const CircleAvatar(
                         radius: 36,
                         backgroundColor: Colors.white,
-                        // 사용자 이미지를 넣으려면 backgroundImage 속성을 사용하세요
                       ),
                       const SizedBox(width: 8),
                       const Spacer(),
@@ -240,6 +239,7 @@ class StatusViewerScreenState extends State<StatusViewerScreen> {
                       ),
                       const SizedBox(height: 16),
                       Container(
+                        margin: const EdgeInsets.only(left: 24),
                         height: 200,
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -281,7 +281,7 @@ class StatusViewerScreenState extends State<StatusViewerScreen> {
                       ),
                       const SizedBox(height: 16),
                       Container(
-                        margin: const EdgeInsets.only(right: 16),
+                        margin: const EdgeInsets.only(right: 24),
                         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 6),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -321,7 +321,7 @@ class StatusViewerScreenState extends State<StatusViewerScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Future가 아직 완료되지 않은 경우 로딩 인디케이터 표시
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           // Future 실행 중 에러 발생 시 에러 메시지 표시
           return Text("Error: ${snapshot.error}");
