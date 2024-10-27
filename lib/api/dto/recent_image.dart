@@ -3,12 +3,14 @@ import '../api.dart';
 
 class ImageDataDTO {
   final int id;
+  final DateTime timestamp;
   final String token;
   final int label;
   final double percent;
 
   ImageDataDTO({
     required this.id,
+    required this.timestamp,
     required this.token,
     required this.label,
     required this.percent,
@@ -22,6 +24,7 @@ class ImageDataDTO {
   factory ImageDataDTO.fromJson(Map<String, dynamic> json) {
     return ImageDataDTO(
       id: json['id'],
+      timestamp: DateTime.parse(json['timestamp']),
       token: json['token'],
       label: json['label'],
       percent: json['percent'],
@@ -32,6 +35,7 @@ class ImageDataDTO {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'timestamp': timestamp.toIso8601String(),
       'token': token,
       'label': label,
       'percent': percent,

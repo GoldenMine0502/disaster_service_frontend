@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'api/api_status.dart';
+
 class StatusViewerScreen extends StatefulWidget {
   const StatusViewerScreen({super.key});
 
@@ -35,6 +37,29 @@ const mainPadding = EdgeInsets.only(left: 25 + 6, right: 25);
 
 class StatusViewerScreenState extends State<StatusViewerScreen> {
   bool isDisaster = false;
+  Image? image;
+
+  Future<bool> fetchCurrentStatus() async {
+    var res = await fetchRecentImages();
+
+    var dto = res.list.where((li) => checkIfWithinOneDay(li.timestamp)).firstOrNull;
+
+    if(dto != null) {
+      image = Image.network(dto.getImageUri());
+    }
+
+    return dto != null;
+  }
+
+  bool checkIfWithinOneDay(DateTime currentTime) {
+    DateTime time = DateTime.now();
+    // 현재 시간에서 특정 시간의 차이를 계산
+    Duration difference = time.difference(currentTime);
+
+    // 차이가 하루(24시간) 이내인지 확인, 테스트용으론 5분으로 처리
+    return difference.inMinutes <= 5;
+    // return difference.inHours <= 24;
+  }
 
   Widget normal(BuildContext context) {
     return Scaffold(
@@ -289,111 +314,29 @@ class StatusViewerScreenState extends State<StatusViewerScreen> {
     );
   }
 
-/*
-Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.asset("assets/icon/sos.png", width: 80),
-                  const SizedBox(width: 8),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.location_on, color: Colors.white),
-                          SizedBox(width: 4),
-                          Text(
-                            "충청북도 충주시",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        "내 위치에서 30KM",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Container(
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Stack(
-                  children: [
-                    Center(
-                      child: Text(
-                        "맵 또는 정보 표시 영역",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 8,
-                      right: 8,
-                      child: Icon(Icons.open_in_full, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      "비상 연락처",
-                      style: TextStyle(
-                        color: Color(0xFF17A1AE),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      "대피소",
-                      style: TextStyle(
-                        color: Color(0xFF17A1AE),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      "실시간 공유",
-                      style: TextStyle(
-                        color: Color(0xFF17A1AE),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          )
- */
-
   @override
   Widget build(BuildContext context) {
-    if (isDisaster) {
-      return disaster(context);
-    } else {
-      return normal(context);
-    }
+    return FutureBuilder<bool>(
+      future: fetchCurrentStatus(), // Future 함수 호출
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Future가 아직 완료되지 않은 경우 로딩 인디케이터 표시
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          // Future 실행 중 에러 발생 시 에러 메시지 표시
+          return Text("Error: ${snapshot.error}");
+        } else if (snapshot.hasData) {
+          // Future가 완료되고 데이터가 있는 경우 true 또는 false에 따라 다른 UI 표시
+          if (snapshot.data == true) {
+            return disaster(context);
+          } else {
+            return normal(context);
+          }
+        } else {
+          // 데이터가 없을 때 (예외 상황)
+          return const Text("No data available.");
+        }
+      },
+    );
   }
 }
