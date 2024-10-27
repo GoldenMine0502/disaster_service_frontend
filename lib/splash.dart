@@ -35,10 +35,10 @@ class SplashScreenState extends State<SplashScreen> {
           children: [
             const SizedBox(height: 20),
             logoBig,
-            const SizedBox(height: 10), // 이미지와 텍스트 사이 간격 조정
+            const SizedBox(height: 20), // 이미지와 텍스트 사이 간격 조정
             const Text(
               "충리미와 재난 대처해요!",
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 20, fontFamily: 'SBAggro'),
             ),
           ],
         ),

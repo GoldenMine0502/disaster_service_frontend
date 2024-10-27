@@ -104,3 +104,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+  fonts:
+    - family: SBAggro
+      fonts:
+        - asset: assets/font/SBAggroB.otf  # otf 파일 경로
+        - asset: assets/font/SBAggroL.otf  # otf 파일 경로
+        - asset: assets/font/SBAggroM.otf  # otf 파일 경로
