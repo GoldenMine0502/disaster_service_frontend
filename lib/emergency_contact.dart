@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 
 const mainTextStyle = TextStyle(
-    fontSize: 25,
+    fontSize: 22,
     fontFamily: 'Pretendard',
     fontWeight: FontWeight.bold
 );
 
 const menuTextStyle = TextStyle(
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: 'Pretendard',
 );
 

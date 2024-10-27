@@ -1,3 +1,4 @@
+import 'package:disaster_service_frontend/settings.dart';
 import 'package:disaster_service_frontend/status_viewer_v2.dart';
 import 'package:flutter/material.dart';
 
@@ -34,7 +35,7 @@ class HomePageState extends State<HomePage> {
     const DisasterGuideScreen(),
     const DisasterShelterScreen(),
     const EmergencyContactScreen(),
-    const EmergencyContactScreen(),
+    const SettingsScreen(),
     const ImageUploadScreen(),
   ];
 
@@ -48,13 +49,13 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     const menuTextStyle = TextStyle(
-        fontSize: 25,
+        fontSize: 22,
         fontFamily: 'Pretendard',
         fontWeight: FontWeight.bold
     );
 
     const menuTextStyleSmall = TextStyle(
-        fontSize: 15,
+        fontSize: 12,
         fontFamily: 'Pretendard',
     );
 

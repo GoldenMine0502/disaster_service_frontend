@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'api/api_status.dart';
@@ -10,34 +12,59 @@ class StatusViewerScreen extends StatefulWidget {
 }
 
 const selectBarTextStyle = TextStyle(
-    fontSize: 20, fontFamily: 'Pretendard', fontWeight: FontWeight.bold);
+    fontSize: 18, fontFamily: 'Pretendard', fontWeight: FontWeight.bold);
 
 const textStyleInBox = TextStyle(
-  fontSize: 26,
+  fontSize: 22,
   fontFamily: 'Pretendard',
   fontWeight: FontWeight.bold,
   color: Colors.white,
 );
 
 const textStyleInBoxTilt = TextStyle(
-  fontSize: 26,
+  fontSize: 22,
   fontFamily: 'Pretendard',
   fontWeight: FontWeight.bold,
   color: Color(0xFF17A1AE),
 );
 
 const textStyleInBoxTiltDisaster = TextStyle(
-  fontSize: 18,
+  fontSize: 16,
   fontFamily: 'Pretendard',
   fontWeight: FontWeight.bold,
   color: Color(0xFF17A1AE),
 );
 
-const mainPadding = EdgeInsets.only(left: 25 + 6, right: 25);
+const mainPadding = EdgeInsets.only(left: 25, right: 25);
 
-class StatusViewerScreenState extends State<StatusViewerScreen> {
+class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBindingObserver {
   bool isDisaster = false;
   Image? image;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    startTimer();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void startTimer() {
+    _timer?.cancel(); // 기존 타이머가 있으면 취소
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      if (mounted) {
+        setState(() {
+        });
+      }
+    });
+  }
 
   Future<bool> fetchCurrentStatus() async {
     var res = await fetchRecentImages();
@@ -73,7 +100,7 @@ class StatusViewerScreenState extends State<StatusViewerScreen> {
             const Text(
               "아무튼 좋은 말\n아무튼 안부인사 같은 말",
               style: TextStyle(
-                fontSize: 28,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Pretendard',
               ),
@@ -107,16 +134,16 @@ class StatusViewerScreenState extends State<StatusViewerScreen> {
                   children: [
                     const SizedBox(width: 15),
                     Container(
-                      width: 70,
+                      width: 68,
                       height: 4,
                       color: const Color(0xFF6F448C),
                     ),
-                    const SizedBox(width: 22),
-                    Container(
-                      width: 70,
-                      height: 4,
-                      color: const Color(0xFFCCCCCC),
-                    ),
+                    // const SizedBox(width: 22),
+                    // Container(
+                    //   width: 70,
+                    //   height: 4,
+                    //   color: const Color(0xFFCCCCCC),
+                    // ),
                   ],
                 )
               ],
@@ -163,7 +190,7 @@ class StatusViewerScreenState extends State<StatusViewerScreen> {
                     ),
                     child: Column(
                       children: [
-                        const Text("재난 위험도 : 현저히 낮음",
+                        const Text("재난 위험 : 없음",
                             style: textStyleInBoxTilt),
                         const SizedBox(height: 20),
                         Row(

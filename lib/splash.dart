@@ -1,3 +1,4 @@
+import 'package:disaster_service_frontend/disaster_shelter.dart';
 import 'package:flutter/material.dart';
 
 import 'consts.dart';
@@ -56,7 +57,8 @@ class SplashScreenState extends State<SplashScreen> {
 }
 
 
-void main() {
+void main() async {
+  await initializeNaverMap();
   runApp(const MaterialApp(
     home: SplashScreen(),
   ));
