@@ -9,8 +9,12 @@ import 'dto/dto_weather.dart';
 
 Future<ResponseCurrentWeather> getCurrentTemperature(RequestCurrentWeather request) async {
   final uri = Uri.parse('$domain/weather/current');
-  final response = await http.get(
-    uri.replace(queryParameters: request.toJson()),
+  final response = await http.post(
+    uri,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode(request.toJson()),
   );
 
   if (response.statusCode != 200) {

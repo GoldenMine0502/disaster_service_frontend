@@ -95,15 +95,17 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
 
         if(status.isGranted) {
           var position = await _determinePosition();
+          debugPrint("${position.latitude}, ${position.longitude}");
           var response = await getCurrentTemperature(
               RequestCurrentWeather(
                   latitude: position.latitude,
                   longitude: position.longitude
               )
           );
-          setState(() {
-            temperature: response;
-          });
+          debugPrint("locationResult: ${locationResult?.locationData.getLevelKey()}");
+
+          locationResult = response;
+          setState(() { });
         }
       }
     });
