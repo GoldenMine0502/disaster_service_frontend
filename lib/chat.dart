@@ -15,6 +15,7 @@ class ChatScreen extends StatefulWidget {
 
 class ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   final List<ChatDTO> _messages = [];
   Timer? _timer;
   final lock = Lock();
@@ -52,14 +53,30 @@ class ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _updateMessages() async {
+    var alreadyScrolled = _isScrolledToBottom();
     var messages = await fetchChatList();
 
     await lock.synchronized(() async {
       _messages.clear();
       _messages.addAll(messages.list);
+
     });
 
+    if(alreadyScrolled) {
+      _scrollToBottom();
+    }
+
     setState(() {});
+  }
+
+  bool _isScrolledToBottom() {
+    return _scrollController.offset >= _scrollController.position.maxScrollExtent;
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
   }
 
   @override
@@ -69,6 +86,7 @@ class ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 var chat = _messages[index];
