@@ -59,6 +59,7 @@ class SplashScreenState extends State<SplashScreen> {
 
 void main() async {
   await initializeNaverMap();
+  debugPrint('naver map init');
   runApp(const MaterialApp(
     home: SplashScreen(),
   ));

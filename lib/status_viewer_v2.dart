@@ -1,8 +1,13 @@
 import 'dart:async';
 
+import 'package:disaster_service_frontend/api/dto/dto_weather.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'api/api_status.dart';
+import 'api/api_weather.dart';
+import 'chat.dart';
 
 class StatusViewerScreen extends StatefulWidget {
   const StatusViewerScreen({super.key});
@@ -41,12 +46,14 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
   bool isDisaster = false;
   Image? image;
   Timer? _timer;
+  ResponseCurrentWeather? locationResult;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     startTimer();
+    requestLocationPermission();
   }
 
   @override
@@ -56,13 +63,82 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
     super.dispose();
   }
 
+  Future<void> requestLocationPermission() async {
+    var status = await Permission.location.status;
+
+    if (status.isDenied) {
+      // Request location permission
+      status = await Permission.location.request();
+    }
+
+    // if (status.isPermanentlyDenied) {
+    //   // Open app settings to manually enable permission
+    //   await openAppSettings();
+    // }
+
+    if (status.isGranted) {
+      debugPrint("Location permission granted.");
+      // Proceed with accessing location
+    } else if (status.isDenied) {
+      debugPrint("Location permission denied.");
+      // Handle the permission denial accordingly
+    }
+  }
+
   void startTimer() {
     _timer?.cancel(); // 기존 타이머가 있으면 취소
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
       if (mounted) {
+        var status = await Permission.location.status;
+
         fetchCurrentStatus();
+
+        if(status.isGranted) {
+          var position = await _determinePosition();
+          var response = await getCurrentTemperature(
+              RequestCurrentWeather(
+                  latitude: position.latitude,
+                  longitude: position.longitude
+              )
+          );
+          setState(() {
+            temperature: response;
+          });
+        }
       }
     });
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled, prompt the user to enable them
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+
+    // Check for location permission
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // Get the current position
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
   }
 
   Future<bool> fetchCurrentStatus() async {
@@ -95,6 +171,14 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
   }
 
   Widget normal(BuildContext context) {
+    var location = locationResult?.locationData.getLevelKey(containLevel1: false) ?? "충청북도";
+    if(location.isEmpty) {
+      location = "충청북도";
+    }
+    var temperature = locationResult?.temperature?.toInt() ?? 25;
+
+    var totalText = "$location $temperature'C";
+
     return Scaffold(
       // backgroundColor: Colors.white,
       body: Padding(
@@ -179,7 +263,7 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
                               Image.asset('assets/icon/location.png',
                                   width: 16),
                               const SizedBox(width: 12),
-                              const Text("충청북도 충주시", style: textStyleInBox),
+                              Text(totalText, style: textStyleInBox),
                               const SizedBox(width: 12),
                             ],
                           ),
@@ -258,7 +342,7 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
                                 ],
                               ),
                               Text(
-                                "       내 위치에서 30KM",
+                                "       내 위치에서 1KM",
                                 style: TextStyle(
                                   color: Colors.red,
                                   fontSize: 16,
@@ -324,20 +408,28 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Text(
+                            const Text(
                               "비상 연락처",
                               style: textStyleInBoxTiltDisaster,
                             ),
-                            Text(
+                            const Text(
                               "대피소",
                               style: textStyleInBoxTiltDisaster,
                             ),
-                            Text(
-                              "실시간 공유",
-                              style: textStyleInBoxTiltDisaster,
+                            GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => ChatScreen()),
+                                  );
+                                },
+                                child: const Text(
+                                  "실시간 채팅",
+                                  style: textStyleInBoxTiltDisaster,
+                                ),
                             ),
                           ],
                         ),
