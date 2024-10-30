@@ -190,11 +190,10 @@ class StatusViewerScreenState extends State<StatusViewerScreen> with WidgetsBind
           children: [
             const SizedBox(height: 20), // 상단 여백
             const Text(
-              "아무튼 좋은 말\n아무튼 안부인사 같은 말",
+              "함께라면 어떤 재난도\n이겨낼 수 있어요!",
               style: TextStyle(
                 fontSize: 24,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Pretendard',
+                fontFamily: 'SBAggro',
               ),
             ),
             const SizedBox(height: 20),
